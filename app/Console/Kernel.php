@@ -2,8 +2,10 @@
 
 namespace App\Console;
 
+use App\Models\Configuration;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Native\Laravel\Facades\MenuBar;
 
 class Kernel extends ConsoleKernel
 {
@@ -12,7 +14,23 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+            $configuration = Configuration::first();
+            logger()->debug($configuration);
+            if (is_null($configuration) || is_null($configuration->provider_config['profile'] ?? null)) {
+                return;
+            }
+
+            logger()->debug('Syncing attendances');
+            $provider = Configuration::timeTrackingProvider();
+            $provider->syncAttendances();
+            $trackedToday = $provider->timeTrackedToday();
+            $minutesToHoursAndMinutes = function ($minutes) {
+                return sprintf('%01dh %02dm', $minutes / 60, $minutes % 60);
+            };
+            $trackedToday = $minutesToHoursAndMinutes($trackedToday);
+            MenuBar::label(' Tracked ' . $trackedToday);
+        })->everyFiveMinutes();
     }
 
     /**
