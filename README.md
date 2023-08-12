@@ -1,5 +1,7 @@
 # Native Time Tracking
 
+![](https://github.com/RuliLG/NativeTimeTracking/blob/3e51a0e8127b3fc5ce7bd22a70ff5c28f8782d2f/storage/app/demo.png)
+
 ## Description
 This is a tool built with [NativePHP](https://nativephp.com/) to track time spent on projects. It is built on the following stack:
 
